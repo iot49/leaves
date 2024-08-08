@@ -1,4 +1,4 @@
-name: Create docker image for leaf-code-server
+name: Create docker image leaf-code-server
 on:
   push:
     branches:

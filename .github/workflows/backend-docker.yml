@@ -1,4 +1,4 @@
-name: Create docker image for leaf backend
+name: Create docker image leaf-backend
 
 on:
   push:
