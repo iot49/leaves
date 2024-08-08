@@ -3,7 +3,7 @@ FROM linuxserver/code-server
 RUN apt-get update --yes && \
     apt-get upgrade --yes && \
     apt-get install --yes \
-    python3.11 \
+    python3 python3-pip pylint3 \
     rsync && \
     echo 'abc ALL=(ALL) NOPASSWD:ALL' | EDITOR='tee -a' visudo
 
