@@ -1,6 +1,7 @@
 FROM linuxserver/code-server
 
 RUN apt-get update --yes && \
+    apt-get upgrade --yes && \
     apt-get install --yes \
     python3.11 \
     rsync && \
