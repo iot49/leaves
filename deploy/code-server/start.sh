@@ -5,11 +5,9 @@ if ! grep -q `hostname` /etc/hosts; then
     bash -c 'echo "127.0.0.1" `hostname` >> /etc/hosts'
 fi
 
-cat <<EOT >> /config/.bashrc
-alias python=/usr/bin/python3
-alias pip=/usr/bin/pip3
-export PATH=\$PATH:/usr/bin
-EOT
+# asks lots of questions, do as user
+# curl -sSf https://rye.astral.sh/get | bash
+# rye sync
 
 # Note: /config/custom-cont-init.d executed (if it exists) when code-server starts
 
