@@ -1,0 +1,30 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: index
+
+defaults:
+  titlesonly: true
+
+parts:
+  - caption: Setup
+    chapters:
+      - file: setup/repo
+      - file: setup/doc
+
+  - caption: Code Library
+    chapters:
+      - file: lib/eventbus
+        sections:
+          - file: lib/eventbus/eventbus
+          - file: lib/eventbus/devices
+      - file: lib/homeassistant
+        sections:
+          - file: lib/homeassistant/mqtt
+
+  - caption: Deploy
+    chapters:
+      - file: deploy/cf-tunnel
+      - file: deploy/github-actions
+      - file: deploy/balena

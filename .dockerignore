@@ -1,0 +1,13 @@
+.env
+.venv
+.coverage
+*.db
+scratch
+
+.dockerignore
+htmlcov
+.coveragerc
+tests
+pytest.ini
+Dockerfile*
+sqlite*
