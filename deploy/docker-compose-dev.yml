@@ -14,7 +14,6 @@ volumes:
   ui: # static files (lit webapp)
   config: # yaml config
   code-server: # code-server configuration and files
-  jupyter: # jupyter notebooks
   homeassistant: # homeassistant configuration
   mosquitto: # mqtt configuration
   letsencrypt: # letsencrypt certificates
@@ -86,7 +85,6 @@ services:
       - repo:/home/repo
       - ui:/home/ui
       - config:/home/config
-      - jupyter:/home/jovyan
       - homeassistant:/home/homeassistant
       - mosquitto:/home/mosquitto
       - letsencrypt:/home/letsencrypt
@@ -111,8 +109,7 @@ services:
       - NB_UID=1000
       - NB_GID=1000
     volumes:
-      - jupyter:/home/jovyan
-      - repo:/home/repo
+      - repo:/home/jovyan/work
       - ui:/home/ui # static files (lit webapp)
       - config:/home/config # config.json, config.yaml & backups
       - homeassistant:/home/homeassistant
@@ -181,7 +178,6 @@ services:
       - ui:/home/ui
       - config:/home/config
       - code-server:/home/code-server
-      - jupyter:/home/jupyter
       - homeassistant:/home/homeassistant
       - letsencrypt:/home/letsencrypt
       - letsencrypt-log:/home/letsencrypt/log

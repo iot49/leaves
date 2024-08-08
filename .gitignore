@@ -1,0 +1,27 @@
+# secrets
+.env
+.envrc
+
+# other exclusions
+*.db
+docker-compose.yml
+
+# machine generated stuff
+.DS_Store
+.coverage
+.venv/
+.direnv/
+.pytest_cache/
+__pycache__/
+_build/
+
+# python generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Temporary exclusions
+BITS/
