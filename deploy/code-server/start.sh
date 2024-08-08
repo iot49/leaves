@@ -5,7 +5,7 @@ if ! grep -q `hostname` /etc/hosts; then
     bash -c 'echo "127.0.0.1" `hostname` >> /etc/hosts'
 fi
 
-# asks lots of questions, do as user
+# RYE installation is interactive, run from command line:
 # curl -sSf https://rye.astral.sh/get | bash
 # rye sync
 

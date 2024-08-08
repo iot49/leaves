@@ -13,6 +13,23 @@ EPOCH_OFFSET = 946684800 if time.gmtime(0)[0] == 2000 else 0
 ActionCallback: TypeAlias = Callable[..., Awaitable[None] | None]
 
 
+"""
+Devices are collections of sensors with a state and actuators that respond to actions.
+
+Client communication is via events:
+
+* `!state` - state update
+* `?act` - action request
+* `?device` - request device information
+* `!device` - device information
+
+The `Device` class implements a registry of devices and their entities (states and actuators). It can 
+also be used by actual hardware to send out and respond to these events.
+
+Derived classes such as `binary_sensor`, `switch`, `light` provide customized solutions.
+"""
+
+
 def State(id, **attributes):
     """entity with a value, e.g. temperature sensor"""
     return (id, "State", None, attributes)
