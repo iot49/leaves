@@ -88,6 +88,8 @@ class Bus:
         Args:
             event (dict)
         """
+        if "src" not in event:
+            event["src"] = self.leaf_id
         topic = event.get("topic")
         if topic in self.listeners:
             # call registered handlers for the topic

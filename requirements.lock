@@ -85,6 +85,8 @@ fastapi-cli==0.0.4
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
+greenlet==3.0.3
+    # via sqlalchemy
 h11==0.14.0
     # via httpcore
     # via uvicorn

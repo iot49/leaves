@@ -1,3 +1,4 @@
+import re
 import time
 from typing import Awaitable, Callable, TypeAlias
 
@@ -5,6 +6,9 @@ from .. import bus
 
 # separation characters in uid's
 UID_SEP = "."
+
+# Convert CamelCase to snake_case (also apply lower to result)
+RE_CAMEL_TO_SNAKE = re.compile(r"(?<!^)(?=[A-Z])")
 
 # MicroPython time starts from 2000-01-01 on some ports
 EPOCH_OFFSET = 946684800 if time.gmtime(0)[0] == 2000 else 0
@@ -90,10 +94,23 @@ class Device:
         bus.emit_sync_kwargs(
             topic="!device",
             uid=self.uid(),
+            domain=self.domain,
             attributes=self.attributes,
-            entites=self.entities,
+            entities=self.info,
             dst="#server",
         )
+
+    @property
+    def info(self):
+        return {
+            uid: {"kind": kind, "attributes": attr}
+            for uid, (kind, _, attr) in self.entities.items()
+        }
+
+    @property
+    def domain(self):
+        """Compatibility with Home Assistant"""
+        return RE_CAMEL_TO_SNAKE.sub("_", self.__class__.__name__).lower()
 
     def uid(self, entity_id: str | None = None) -> str:
         """
@@ -143,18 +160,21 @@ class Device:
 
 @bus.on("?device")
 async def device_info(src, **rest):
+    """Send info for all registered devices"""
     for uid, device in Device._registry.items():
         await bus.emit_kwargs(
             topic="!device",
             uid=uid,
+            domain=device.domain,
             attributes=device.attributes,
-            entities=device.entities,
+            entities=device.info,
             dst=src,
         )
 
 
 @bus.on("?act")
 async def act(topic, uid, **event):
+    """Call callback for entity"""
     device_uid, _ = uid.rsplit(UID_SEP, 1)
     device = Device._registry.get(device_uid)
     if device is None:

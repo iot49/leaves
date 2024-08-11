@@ -6,7 +6,7 @@ from .bus import Bus
 # singleton
 bus = Bus()
 
-from .devices import State
+from .devices import Actuator, Device, State, Transducer
 from .devices.binary_sensor import BinarySensor
 from .devices.light import Light
 from .devices.sensor import Sensor
