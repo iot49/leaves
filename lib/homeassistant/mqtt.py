@@ -32,8 +32,8 @@ async def init(client):
                     "state": msg.payload,
                 },
             )
-            await bus.emit({"topic": "!action", "uid": uid, "state": msg.payload})
+            await bus.emit_event({"topic": "!action", "uid": uid, "state": msg.payload})
 
     asyncio.create_task(action_listener())
 
-    await bus.emit_kwargs(topic="?device", src="me")
+    await bus.emit(topic="?device", src="me")

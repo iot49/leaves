@@ -39,7 +39,7 @@ class MQTT:
                     "state": msg.payload,
                 },
             )
-            await bus.emit({"topic": "!action", "uid": uid, "state": msg.payload})
+            await bus.emit_event({"topic": "!action", "uid": uid, "state": msg.payload})
 
     async def run(self):
         Device.subscribe(self.new_device_listener)

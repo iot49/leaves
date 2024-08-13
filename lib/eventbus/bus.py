@@ -2,6 +2,8 @@ import asyncio
 import functools
 from typing import Awaitable, Callable, TypeAlias
 
+from .singleton import singleton
+
 ALL_HANDLER = "*"
 NO_HANDLER = "!"
 
@@ -9,12 +11,15 @@ NO_HANDLER = "!"
 Callback: TypeAlias = Callable[..., Awaitable[None] | None]
 
 
+@singleton
 class Bus:
     """
     A class that represents an event emitter.
 
     The EventEmitter class allows registering event handlers for specific topics and emitting events to those handlers.
     """
+
+    leaf_id: str = "leaf_id"
 
     def __init__(self, *, sync_queue_size=20, pause=0.1):
         """
@@ -31,7 +36,6 @@ class Bus:
         self.event_queue = None
         self.sync_queue_size = sync_queue_size
         self.pause = pause
-        self.leaf_id = "leaf_id"
 
     def subscribe(self, cb: Callback, *topics):
         """Subscribe callback to one or more topics."""
@@ -81,7 +85,7 @@ class Bus:
 
         return decorator_on
 
-    async def emit(self, event):
+    async def emit_event(self, event):
         """
         Emits an event to all registered event handlers for the given topic.
 
@@ -100,11 +104,11 @@ class Bus:
         # call registered handlers for all topics
         await self._call_handler(self.listeners.get(ALL_HANDLER, []), event)
 
-    async def emit_kwargs(self, **kwargs):
+    async def emit(self, **kwargs):
         """Same as `emit`, but accepts kwargs."""
-        await self.emit(kwargs)
+        await self.emit_event(kwargs)
 
-    def emit_sync(self, event):
+    def emit_event_sync(self, event):
         """
         Emit event from synchronous code.
 
@@ -128,20 +132,23 @@ class Bus:
             # Note: no log message - as that would generate another emit_sync event!
             print("***** sync event queue overflow")
 
-    def emit_sync_kwargs(self, **kwargs):
+    def emit_sync(self, **kwargs):
         """Same as `emit_sync`, but accepts kwargs."""
-        self.emit_sync(kwargs)
+        self.emit_event_sync(kwargs)
 
     async def _sync_emit_task(self, pause):
         """Helper task to send sync events."""
         while True:
             event = await self.event_queue.get()  # type: ignore
-            await self.emit(event)
+            await self.emit_event(event)
             await asyncio.sleep(pause)
 
     async def _call_handler(self, funcs: list[Callback], event):
         """Helper to call sync / async callbacks."""
         for func in funcs:
-            res = func(**event)
-            if isinstance(res, Awaitable):
-                await res
+            try:
+                res = func(**event)
+                if isinstance(res, Awaitable):
+                    await res
+            except TypeError as e:
+                print("***** ERROR in bus.emit:", e)

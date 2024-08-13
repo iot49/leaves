@@ -25,36 +25,36 @@ async def test_events():
         bus.subscribe(cb, "topic1")
 
         # emit to registered handler
-        await bus.emit(events["topic1"])
+        await bus.emit_event(events["topic1"])
         assert N == 1
 
         # emit topic with no handler
-        await bus.emit(events["topic2"])
+        await bus.emit_event(events["topic2"])
         assert N == 1
 
         # emit to catch event with no handler
         bus.subscribe(cb, "!")
-        await bus.emit(events["topic2"])
+        await bus.emit_event(events["topic2"])
         assert N == 2
 
         # emit to all handlers
         bus.subscribe(cb, "*")
-        await bus.emit(events["topic2"])
+        await bus.emit_event(events["topic2"])
         assert N == 4
 
         # emit sync event
-        bus.emit_sync(events["topic1"])
+        bus.emit_event_sync(events["topic1"])
         await asyncio.sleep(bus.pause + 0.001)
         assert N == 6
 
         # unsubscribe topic1 handler
         bus.unsubscribe(cb, "topic1")
-        await bus.emit(events["topic1"])
+        await bus.emit_event(events["topic1"])
         assert N == 7
 
         # unsubscribe all handlers
         bus.unsubscribe(cb, "*", "!")
-        await bus.emit(events["topic1"])
+        await bus.emit_event(events["topic1"])
         assert N == 7
 
 
@@ -76,11 +76,11 @@ async def DISABLE_test_on():
         assert events[topic]["data"] == data
 
     # emit to registered handler
-    await bus.emit(events["topic1"])
+    await bus.emit_event(events["topic1"])
     assert N == 1
 
     # emit topic with no handler
-    await bus.emit(events["topic2"])
+    await bus.emit_event(events["topic2"])
     assert N == 1
 
     # emit to catch to topic without handler
@@ -90,7 +90,7 @@ async def DISABLE_test_on():
         N += 1
         assert events[topic]["data"] == data
 
-    await bus.emit(events["topic2"])
+    await bus.emit_event(events["topic2"])
     assert N == 2
 
     # emit to all handlers
@@ -100,5 +100,5 @@ async def DISABLE_test_on():
         N += 1
         assert events[topic]["data"] == data
 
-    await bus.emit(events["topic2"])
+    await bus.emit_event(events["topic2"])
     assert N == 4

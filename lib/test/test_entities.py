@@ -25,4 +25,6 @@ async def test_entities():
     await ent1.update("entity_1_update")
     await ent2.update("entity_1_update")
 
-    await bus.emit({"topic": "!action", "action": "action2", "value": "action1_value"})
+    await bus.emit_event(
+        {"topic": "!action", "action": "action2", "value": "action1_value"}
+    )

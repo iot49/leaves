@@ -17,6 +17,11 @@ EPOCH_OFFSET = 946684800 if time.gmtime(0)[0] == 2000 else 0
 ActionCallback: TypeAlias = Callable[..., Awaitable[None] | None]
 
 
+def make_uid(device_id: str, entity_id: str, node_id=bus.leaf_id) -> str:
+    """Construct entity uid."""
+    return f"{node_id}{UID_SEP}{device_id}{UID_SEP}{entity_id}"
+
+
 """
 Devices are collections of sensors with a state and actuators that respond to actions.
 
@@ -87,11 +92,11 @@ class Device:
         self._registry[self.uid()] = self
         for entity_id, kind, callback, attributes in entities:
             assert entity_id.isidentifier(), f"Invalid id: {entity_id}"
-            entity_uid = self.uid(entity_id)
+            entity_uid = self.uid(entity_id=entity_id)
             self.entities[entity_uid] = (kind, callback, attributes)
             if callback is not None:
                 self._callbacks[entity_uid] = callback
-        bus.emit_sync_kwargs(
+        bus.emit_sync(
             topic="!device",
             uid=self.uid(),
             domain=self.domain,
@@ -146,9 +151,9 @@ class Device:
             timestamp (float, optional): The timestamp of the update event. Defaults to the current time.
 
         """
-        await bus.emit_kwargs(
+        await bus.emit(
             topic="!state",
-            uid=entity_id if "." in entity_id else self.uid(entity_id),
+            uid=entity_id if "." in entity_id else self.uid(entity_id=entity_id),
             value=value,
             timestamp=timestamp,
         )
@@ -162,7 +167,7 @@ class Device:
 async def device_info(src, **rest):
     """Send info for all registered devices"""
     for uid, device in Device._registry.items():
-        await bus.emit_kwargs(
+        await bus.emit(
             topic="!device",
             uid=uid,
             domain=device.domain,
@@ -181,4 +186,6 @@ async def act(topic, uid, **event):
         return
     _, callback, _ = device.entities.get(uid) or (None, None, None)
     if callback is not None:
+        event.pop("src", None)
+        event.pop("dst", None)
         await callback(device, uid, **event)
