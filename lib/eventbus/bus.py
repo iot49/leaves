@@ -85,30 +85,48 @@ class Bus:
 
         return decorator_on
 
-    async def emit_event(self, event):
+    async def listen(self, topic: str):
+        """Wait for a single event on the given topic."""
+        flag = asyncio.Event()
+        event = None
+
+        async def cb(**_event):
+            nonlocal event, flag
+            flag.set()
+            event = _event
+
+        self.subscribe(cb, topic)
+        await flag.wait()
+        self.unsubscribe(cb, topic)
+        return event
+
+    async def emit(self, event: dict | None = None, **kwargs):
         """
         Emits an event to all registered event handlers for the given topic.
+        Event may be specified as a dict or kwargs or both (in which kwargs
+        take precedence and are merged into event).
 
         Args:
             event (dict)
+            **kwargs: Arguments to pass to the event handler. Merged into event.
         """
-        if "src" not in event:
-            event["src"] = self.leaf_id
+        if event is None:
+            event = kwargs
+        else:
+            event.update(kwargs)
+        # used only by events that expect a response - set in those?
+        # if "src" not in event: event["src"] = self.leaf_id
         topic = event.get("topic")
         if topic in self.listeners:
             # call registered handlers for the topic
-            await self._call_handler(self.listeners[topic], event)
+            await self._call_handler(self.listeners[topic], event)  # type: ignore
         else:
             # no registered handlers for the topic - call catch-all handler
             await self._call_handler(self.listeners.get(NO_HANDLER, []), event)
         # call registered handlers for all topics
         await self._call_handler(self.listeners.get(ALL_HANDLER, []), event)
 
-    async def emit(self, **kwargs):
-        """Same as `emit`, but accepts kwargs."""
-        await self.emit_event(kwargs)
-
-    def emit_event_sync(self, event):
+    def emit_sync(self, event: dict | None = None, **kwargs):
         """
         Emit event from synchronous code.
 
@@ -132,15 +150,11 @@ class Bus:
             # Note: no log message - as that would generate another emit_sync event!
             print("***** sync event queue overflow")
 
-    def emit_sync(self, **kwargs):
-        """Same as `emit_sync`, but accepts kwargs."""
-        self.emit_event_sync(kwargs)
-
     async def _sync_emit_task(self, pause):
         """Helper task to send sync events."""
         while True:
             event = await self.event_queue.get()  # type: ignore
-            await self.emit_event(event)
+            await self.emit(event)
             await asyncio.sleep(pause)
 
     async def _call_handler(self, funcs: list[Callback], event):

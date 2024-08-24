@@ -29,8 +29,15 @@ serve:
 
 deploy:
 	(cd deploy && set -o allexport && source ../.env && set +o allexport && envsubst < "docker-compose-dev.yml" > "docker-compose.yml";)
-	cd deploy && balena push -m boser/leaf
+	cd deploy && balena push -m boser/leaf49
 	cd deploy && rm docker-compose.yml
+
+deploy-extra:
+	(cd deploy && set -o allexport && source ../.env-extra && set +o allexport && envsubst < "docker-compose-dev.yml" > "docker-compose.yml";)
+	cd deploy && balena push -m boser/leaf-extra
+	cd deploy && rm docker-compose.yml
+
+
 
 doc:
 	jupyter-book build doc

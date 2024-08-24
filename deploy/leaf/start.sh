@@ -24,7 +24,7 @@ if [[ ${ENVIRONMENT} == "prod" ]]; then
     (cd app; setuidgid app python leaf/main.py)
 else
     # run from repo (setup in editor with rye)
-    (cd /home/repo/backend; setuidgid app python leaf/main.py)
+    (cd /home/repo; setuidgid app python leaf/main.py)
 fi
 
 sleep infinity

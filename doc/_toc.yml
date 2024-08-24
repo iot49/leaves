@@ -13,6 +13,12 @@ parts:
       - file: setup/repo
       - file: setup/doc
 
+  - caption: App Overview
+    chapters:
+      - file: app/network
+      - file: app/nodes
+      - file: app/cf-tunnel
+
   - caption: Code Library
     chapters:
       - file: lib/eventbus

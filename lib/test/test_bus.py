@@ -25,37 +25,61 @@ async def test_events():
         bus.subscribe(cb, "topic1")
 
         # emit to registered handler
-        await bus.emit_event(events["topic1"])
+        await bus.emit(events["topic1"])
         assert N == 1
 
         # emit topic with no handler
-        await bus.emit_event(events["topic2"])
+        await bus.emit(events["topic2"])
         assert N == 1
 
         # emit to catch event with no handler
         bus.subscribe(cb, "!")
-        await bus.emit_event(events["topic2"])
+        await bus.emit(events["topic2"])
         assert N == 2
 
         # emit to all handlers
         bus.subscribe(cb, "*")
-        await bus.emit_event(events["topic2"])
+        await bus.emit(events["topic2"])
         assert N == 4
 
         # emit sync event
-        bus.emit_event_sync(events["topic1"])
+        bus.emit_sync(events["topic1"])
         await asyncio.sleep(bus.pause + 0.001)
         assert N == 6
 
         # unsubscribe topic1 handler
         bus.unsubscribe(cb, "topic1")
-        await bus.emit_event(events["topic1"])
+        await bus.emit(events["topic1"])
         assert N == 7
 
         # unsubscribe all handlers
         bus.unsubscribe(cb, "*", "!")
-        await bus.emit_event(events["topic1"])
-        assert N == 7
+
+
+async def test_listen():
+    N = 0
+    event = {"topic": "listen", "data": "some data"}
+
+    async def listen_task1():
+        nonlocal N, event
+        assert await bus.listen("listen") == event
+        N += 1
+
+    asyncio.create_task(listen_task1())
+    await asyncio.sleep(0)  # start the task
+    await bus.emit(event)
+
+    # kwargs take precedence
+    async def listen_task2():
+        nonlocal N
+        assert await bus.listen("listen") == {"topic": "listen", "data": "new data"}
+        N += 1
+
+    asyncio.create_task(listen_task2())
+    await asyncio.sleep(0)  # start the task
+    await bus.emit({"topic": "listen", "data": "old data"}, data="new data")
+    await asyncio.sleep(0)  # let event propagate
+    assert N == 2
 
 
 # Note: @bus.on handlers cannot be un/resubscribed, causing problems
@@ -76,11 +100,11 @@ async def DISABLE_test_on():
         assert events[topic]["data"] == data
 
     # emit to registered handler
-    await bus.emit_event(events["topic1"])
+    await bus.emit(events["topic1"])
     assert N == 1
 
     # emit topic with no handler
-    await bus.emit_event(events["topic2"])
+    await bus.emit(events["topic2"])
     assert N == 1
 
     # emit to catch to topic without handler
@@ -90,7 +114,7 @@ async def DISABLE_test_on():
         N += 1
         assert events[topic]["data"] == data
 
-    await bus.emit_event(events["topic2"])
+    await bus.emit(events["topic2"])
     assert N == 2
 
     # emit to all handlers
@@ -100,5 +124,5 @@ async def DISABLE_test_on():
         N += 1
         assert events[topic]["data"] == data
 
-    await bus.emit_event(events["topic2"])
+    await bus.emit(events["topic2"])
     assert N == 4

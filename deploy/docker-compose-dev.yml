@@ -6,7 +6,7 @@ version: '2'
 
 networks:
   tunnel: # cloudflared tunnel ingress
-  apps: # application network (api, code-server, jupyter, rclone, letsencrypt)
+  apps: # application network (leaf, code-server)
   mqtt: # mqtt network
 
 volumes:
@@ -29,24 +29,21 @@ volumes:
 services:
   # internet proxy
   tunnel:
+    # IMPORTANT: set TUNNEL_TOKEN in the Balena dashboard
     container_name: tunnel
     image: cloudflare/cloudflared:latest
-    environment:
-      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
     restart: unless-stopped
     command: tunnel run
     networks:
       - tunnel
     depends_on:
-      - backend
-      - jupyter
+      - leaf
       - code-server
-      - homeassistant
 
   # leaf app
   leaf:
     container_name: leaf
-    image: ttmetro/leaf-backend
+    image: ttmetro/leaf
     environment:
       - ENVIRONMENT=dev
       - PROJECT_NAME=${PROJECT_NAME}
@@ -84,13 +81,11 @@ services:
     volumes:
       - code-server:/config
       - repo:/home/repo
-      - ui:/home/ui
       - config:/home/config
       - homeassistant:/home/homeassistant
       - mosquitto:/home/mosquitto
       - letsencrypt:/home/letsencrypt
       - letsencrypt-log:/home/letsencrypt/log
-      - rclone:/home/rclone
     ports:
       - 8443:8443
     restart: unless-stopped
