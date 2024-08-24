@@ -25,3 +25,4 @@ wheels/
 # Temporary exclusions
 BITS/
 pysh.py
+*COPY*

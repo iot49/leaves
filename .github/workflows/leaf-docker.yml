@@ -1,4 +1,4 @@
-name: Create docker image "leaf"
+name: Create docker image "leaf" and push to Docker Hub
 
 on:
   push:
