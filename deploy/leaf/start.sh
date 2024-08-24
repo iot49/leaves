@@ -21,7 +21,7 @@ chmod a+w /home/homeassistant/*.yaml  # homeassistant runs as root ...
 
 if [[ ${ENVIRONMENT} == "prod" ]]; then
     # run from docker image
-    setguid app python leaf/main.py
+    (cd app; setguid app python leaf/main.py)
 else
     # run from repo (setup in editor with rye)
     (cd /home/repo/backend; setguid app python leaf/main.py)

@@ -39,9 +39,10 @@ COPY ./leaf $APP_HOME/leaf
 COPY ./lib $APP_HOME/lib
 
 # Note: build runs from repo root!
-COPY ./deploy/leaf/start.sh $HOME
+WORKDIR $HOME
+COPY ./deploy/leaf/start.sh .
 
-RUN chown -R app:app $HOME
+RUN chown -R app:app .
 
-CMD [/bin/bash, $HOME/start.sh]
+CMD ["/bin/bash", "start.sh"]
 
