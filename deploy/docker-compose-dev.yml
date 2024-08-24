@@ -10,18 +10,24 @@ networks:
   mqtt: # mqtt network
 
 volumes:
-  repo: # git repository
-  ui: # static files (lit webapp)
-  config: # yaml config
+  repo: # github repository (leaf code, public)
+  config: # yaml config (github, private)
+
+  # vscode editor
   code-server: # code-server configuration and files
+
+  # homeassistant and related
   homeassistant: # homeassistant configuration
   mosquitto: # mqtt configuration
+  esphome: # esphome configuration
+
+  # certificates (certbot)
   letsencrypt: # letsencrypt certificates
   letsencrypt-log: # letsencrypt logs
   cloudflare: # cloudflare credentials
-  rclone: # rclone configuration
 
 services:
+  # internet proxy
   tunnel:
     container_name: tunnel
     image: cloudflare/cloudflared:latest
@@ -37,30 +43,24 @@ services:
       - code-server
       - homeassistant
 
-  backend:
-    container_name: backend
+  # leaf app
+  leaf:
+    container_name: leaf
     image: ttmetro/leaf-backend
     environment:
       - ENVIRONMENT=dev
       - PROJECT_NAME=${PROJECT_NAME}
       - DOMAIN=${DOMAIN}
-      - FIRST_SUPERUSER_EMAIL=${FIRST_SUPERUSER_EMAIL}
-      - DATABASE_ECHO=False
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
       - CONFIG_DIR=/home/config
-      - UI_DIR=/home/ui
       - CF_POLICY_AUD=${CF_POLICY_AUD}
       - CF_TEAM_DOMAIN=${CF_TEAM_DOMAIN}
       - CF_API_TOKEN=${CF_API_TOKEN}
       - CF_EMAIL=${CF_EMAIL}
-      - ANALYTICS_API_KEY=${ANALYTICS_API_KEY}
     restart: unless-stopped
     expose:
       - 8000
     volumes:
       - repo:/home/repo # git repository
-      - ui:/home/ui # static files (lit webapp)
       - config:/home/config # config.json, config.yaml & backups
       - homeassistant:/home/homeassistant # to set permissions (in start.sh)
       - letsencrypt:/home/letsencrypt # certificates
@@ -70,6 +70,7 @@ services:
       - apps
       - mqtt
 
+  # editor
   code-server:
     # image: lscr.io/linuxserver/code-server:latest
     image: ttmetro/leaf-code-server
@@ -97,93 +98,3 @@ services:
       - tunnel
       - apps
       - mqtt
-
-  jupyter:
-    # image: jupyter/scipy-notebook
-    image: ttmetro/leaf-jupyter
-    container_name: jupyter
-    command: "start-notebook.sh --allow-root --NotebookApp.token='' --NotebookApp.password=''"
-    user: root
-    environment:
-      - GRANT_SUDO=yes
-      - NB_UID=1000
-      - NB_GID=1000
-    volumes:
-      - repo:/home/jovyan/work
-      - ui:/home/ui # static files (lit webapp)
-      - config:/home/config # config.json, config.yaml & backups
-      - homeassistant:/home/homeassistant
-      - mosquitto:/home/mosquitto
-      - letsencrypt:/home/letsencrypt
-      - letsencrypt-log:/home/letsencrypt/log
-      - rclone:/home/rclone
-    ports:
-      - 8888:8888
-    restart: unless-stopped
-    networks:
-      - tunnel
-      - apps
-      - mqtt
-
-  mqtt:
-    image: eclipse-mosquitto:2.0.18
-    container_name: mqtt
-    volumes:
-      - mosquitto:/mosquitto
-    ports:
-      - 1883:1883
-    restart: unless-stopped
-    networks:
-      - mqtt
-
-  # https://www.home-assistant.io/installation/alternative/#docker-compose
-  # https://github.com/home-assistant/docker/blob/master/Dockerfile
-  homeassistant:
-    image: 'ghcr.io/home-assistant/home-assistant:stable'
-    container_name: homeassistant
-    volumes:
-      - homeassistant:/config
-      - /run/dbus:/run/dbus:ro
-      # - /etc/localtime:/etc/localtime:ro
-    restart: unless-stopped
-    privileged: true
-    ports:
-      - 8123:8123
-    labels:
-      io.balena.features.dbus: 1
-    environment:
-      - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
-    networks:
-      - tunnel
-      - mqtt
-
-  # letsencrypt certificate factory
-  # https://eff-certbot.readthedocs.io/
-  # https://www.nodinrogers.com/post/2022-03-10-certbot-cloudflare-docker/
-  certbot:
-    image: certbot/dns-cloudflare
-    restart: no
-    volumes:
-      - cloudflare:/opt/cloudflare
-      - letsencrypt:/etc/letsencrypt
-      - letsencrypt-log:/var/log/letsencrypt
-
-  rclone:
-    image: rclone/rclone:1.67
-    container_name: rclone
-    # command: rcd --rc-web-gui --rc-addr :5572 # --rc-user jsmith --rc-pass mypassword
-    volumes:
-      - rclone:/config/rclone
-      - repo:/home/repo
-      - ui:/home/ui
-      - config:/home/config
-      - code-server:/home/code-server
-      - homeassistant:/home/homeassistant
-      - letsencrypt:/home/letsencrypt
-      - letsencrypt-log:/home/letsencrypt/log
-      - cloudflare:/home/cloudflare
-    restart: no
-    environment:
-      - PHP_TZ=America/Los_Angeles
-      - PUID=1000
-      - PGID=1000

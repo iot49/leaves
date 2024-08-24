@@ -1,4 +1,4 @@
-name: Create docker image leaf: runs leaf code from github repository
+name: Create docker image "leaf"
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'deploy/leaf/**'
-      - 'server/**'
+      - 'leaf/**'
       - 'lib/**'
       - 'requirements.lock'
       - 'requirements-dev.lock'
@@ -17,7 +17,7 @@ env:
 
 jobs:
   build:
-    name: Build Docker Image for leaf backend
+    name: Build Docker Image for leaf
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,6 +40,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.IMAGE }}:latest
-          file: ./deploy/backend/Dockerfile
+          file: ./deploy/leaf/Dockerfile
           cache-from: type=gha
           cache-to: type=gha, mode=max

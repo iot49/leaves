@@ -10,7 +10,9 @@
 #   universal: false
 
 -e file:.
-aiohttp==3.9.5
+aiohappyeyeballs==2.4.0
+    # via aiohttp
+aiohttp==3.10.5
     # via leaves
 aiomqtt==2.2.0
     # via leaves
@@ -85,8 +87,6 @@ fastapi-cli==0.0.4
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
-greenlet==3.0.3
-    # via sqlalchemy
 h11==0.14.0
     # via httpcore
     # via uvicorn

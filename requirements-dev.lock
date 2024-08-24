@@ -12,7 +12,9 @@
 -e file:.
 accessible-pygments==0.0.5
     # via pydata-sphinx-theme
-aiohttp==3.9.5
+aiohappyeyeballs==2.4.0
+    # via aiohttp
+aiohttp==3.10.5
     # via leaves
 aiomqtt==2.2.0
     # via leaves
@@ -33,6 +35,8 @@ anyio==4.4.0
     # via leaves
     # via starlette
     # via watchfiles
+appnope==0.1.4
+    # via ipykernel
 asttokens==2.4.1
     # via stack-data
 async-lru==2.0.4
@@ -137,8 +141,6 @@ frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
 ghp-import==2.1.0
-greenlet==3.0.3
-    # via sqlalchemy
 h11==0.14.0
     # via httpcore
     # via uvicorn
