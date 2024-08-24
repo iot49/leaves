@@ -1,6 +1,5 @@
 # secrets
-.env
-.envrc
+.env*
 
 # other exclusions
 *.db
