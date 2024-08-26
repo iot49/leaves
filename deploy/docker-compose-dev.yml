@@ -72,7 +72,7 @@ services:
   # editor
   code-server:
     # image: lscr.io/linuxserver/code-server:latest
-    image: ttmetro/leaf-code-server
+    image: ttmetro/leaf-code-server:4.92.2
     container_name: ttmetro/leaf-code-server
     environment:
       - PUID=1000
@@ -99,7 +99,7 @@ services:
   # https://www.home-assistant.io/installation/alternative/#docker-compose
   # https://github.com/home-assistant/docker/blob/master/Dockerfile
   homeassistant:
-    image: 'ghcr.io/home-assistant/home-assistant:stable'
+    image: 'ghcr.io/home-assistant/home-assistant:2024.8.3'
     container_name: homeassistant
     volumes:
       - homeassistant:/config
@@ -131,7 +131,7 @@ services:
       - mqtt
 
   esphome:
-    image: esphome/esphome:latest
+    image: esphome/esphome:2024.8
     container_name: esphome
     volumes:
       - esphome:/config
