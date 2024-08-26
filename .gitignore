@@ -1,6 +1,5 @@
 # secrets
 .env*
-nodes.md
 
 # other exclusions
 *.db

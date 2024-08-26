@@ -36,7 +36,6 @@ RUN pip install --upgrade pip && \
 
 # code: dev runs from /home/repo; prod runs from /home/app/web
 COPY ./leaf $APP_HOME/leaf
-COPY ./lib $APP_HOME/lib
 
 # Note: build runs from repo root!
 WORKDIR $HOME

@@ -10,8 +10,7 @@ networks:
   mqtt: # mqtt network
 
 volumes:
-  repo: # github repository (leaf code, public)
-  config: # yaml config (github, private)
+  repo: # github repositories: leaves, config
 
   # vscode editor
   code-server: # code-server configuration and files
@@ -25,6 +24,9 @@ volumes:
   letsencrypt: # letsencrypt certificates
   letsencrypt-log: # letsencrypt logs
   cloudflare: # cloudflare credentials
+
+  # rclone
+  rclone: # rclone configuration
 
 services:
   # internet proxy
@@ -46,9 +48,10 @@ services:
     image: ttmetro/leaf
     environment:
       - ENVIRONMENT=dev
-      - PROJECT_NAME=${PROJECT_NAME}
+      - DEPLOY_NAME=${DEPLOY_NAME}
       - DOMAIN=${DOMAIN}
-      - CONFIG_DIR=/home/config
+      - GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}
+      - CONFIG_DIR=/home/repo/config
       - CF_POLICY_AUD=${CF_POLICY_AUD}
       - CF_TEAM_DOMAIN=${CF_TEAM_DOMAIN}
       - CF_API_TOKEN=${CF_API_TOKEN}
@@ -58,7 +61,6 @@ services:
       - 8000
     volumes:
       - repo:/home/repo # git repository
-      - config:/home/config # config.json, config.yaml & backups
       - homeassistant:/home/homeassistant # to set permissions (in start.sh)
       - letsencrypt:/home/letsencrypt # certificates
       - cloudflare:/home/cloudflare # certbot credentials
@@ -77,12 +79,12 @@ services:
       - PGID=1000
       - TZ=Etc/PDT
       - SUDO_PASSWORD="${SUDO_PASSWORD}"
-      - DEFAULT_WORKSPACE=/home/repo
+      - DEFAULT_WORKSPACE=/home/repo/leaves
     volumes:
       - code-server:/config
       - repo:/home/repo
-      - config:/home/config
       - homeassistant:/home/homeassistant
+      - esphome:/home/esphome
       - mosquitto:/home/mosquitto
       - letsencrypt:/home/letsencrypt
       - letsencrypt-log:/home/letsencrypt/log
@@ -93,3 +95,74 @@ services:
       - tunnel
       - apps
       - mqtt
+
+  # https://www.home-assistant.io/installation/alternative/#docker-compose
+  # https://github.com/home-assistant/docker/blob/master/Dockerfile
+  homeassistant:
+    image: 'ghcr.io/home-assistant/home-assistant:stable'
+    container_name: homeassistant
+    volumes:
+      - homeassistant:/config
+      - /run/dbus:/run/dbus:ro
+      # - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - 8123:8123/tcp
+      - 5353:5353/tcp
+      - 1900:1900/tcp
+    labels:
+      io.balena.features.dbus: 1
+    environment:
+      - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+    networks:
+      - tunnel
+      - mqtt
+
+  mqtt:
+    image: eclipse-mosquitto:2.0.18
+    container_name: mqtt
+    volumes:
+      - mosquitto:/mosquitto
+    ports:
+      - 1883:1883
+    restart: unless-stopped
+    networks:
+      - mqtt
+
+  esphome:
+    image: esphome/esphome:latest
+    container_name: esphome
+    volumes:
+      - esphome:/config
+    restart: unless-stopped
+    ports:
+      - 6052:6052
+    environment:
+      - TZ=America/Los_Angeles
+
+  # letsencrypt certificate factory
+  # https://eff-certbot.readthedocs.io/
+  # https://www.nodinrogers.com/post/2022-03-10-certbot-cloudflare-docker/
+  certbot:
+    image: certbot/dns-cloudflare
+    restart: no
+    volumes:
+      - cloudflare:/opt/cloudflare
+      - letsencrypt:/etc/letsencrypt
+      - letsencrypt-log:/var/log/letsencrypt
+
+  # backup - or rather use github/cron to backup homeassistant and esphome configs?
+  rclone:
+    image: rclone/rclone:1.67
+    container_name: rclone
+    # command: rcd --rc-web-gui --rc-addr :5572 # --rc-user jsmith --rc-pass mypassword
+    volumes:
+      - rclone:/config/rclone
+      - homeassistant:/home/homeassistant
+      - esphome:/home/esphome
+    restart: no
+    environment:
+      - PHP_TZ=America/Los_Angeles
+      - PUID=1000
+      - PGID=1000
