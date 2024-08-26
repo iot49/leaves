@@ -18,7 +18,7 @@ FROM python:3.11-slim-bookworm
 
 # setuidgid
 RUN apt-get update --yes && \
-    apt-get install --yes --no-install-recommends daemontools
+    apt-get install --yes --no-install-recommends daemontools git
 
 # create user with app-wide uid and gid
 RUN mkdir -p /home/app && \
