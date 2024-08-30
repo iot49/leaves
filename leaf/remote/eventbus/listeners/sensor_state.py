@@ -1,7 +1,6 @@
-from . import bus, singleton
+from .. import bus
 
 
-@singleton
 class SensorState:
     """Keep tack of state values."""
 
@@ -9,11 +8,11 @@ class SensorState:
         self._state = {}
 
         @bus.on("!state")
-        def update(uid, value, timestamp, **rest):
+        def update(topic, src, dst, uid, value, timestamp):
             self._state[uid] = (value, timestamp)
 
         @bus.on("?state")
-        async def get(src, uid=None, **rest):
+        async def get(topic, src, dst, uid=None):
             if uid is None:
                 # copy keys to protect against modification in !state by a different task
                 for uid in list(self._state.keys()):

@@ -34,10 +34,10 @@ chmod a+w /home/homeassistant/*.yaml  # homeassistant runs as root ...
 # start app
 if [[ ${ENVIRONMENT} == "prod" ]]; then
     # run from docker image
-    (cd app; setuidgid app python leaf/main.py)
+    (cd app/leaf; setuidgid app python main.py)
 else
     # run from repo (setup in editor with rye)
-    (cd /home/repo/leaves; setuidgid app python leaf/main.py)
+    (cd /home/repo/leaves/leaf/remote; setuidgid app python main.py)
 fi
 
 sleep infinity

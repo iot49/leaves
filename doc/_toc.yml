@@ -12,6 +12,7 @@ parts:
     chapters:
       - file: setup/repo
       - file: setup/doc
+      - file: setup/dev-on-server
 
   - caption: App Overview
     chapters:
@@ -19,18 +20,19 @@ parts:
       - file: app/nodes
       - file: app/cf-tunnel
 
-  - caption: Code Library
+  - caption: Leaf
     chapters:
-      - file: lib/eventbus
+      - file: leaf/network
+      - file: leaf/eventbus
         sections:
-          - file: lib/eventbus/eventbus
-          - file: lib/eventbus/devices
-      - file: lib/homeassistant
+          - file: leaf/eventbus/eventbus
+          - file: leaf/eventbus/devices
+          - file: leaf/eventbus/client-server
+      - file: leaf/homeassistant
         sections:
-          - file: lib/homeassistant/mqtt
+          - file: leaf/homeassistant/mqtt
 
   - caption: Deploy
     chapters:
-      - file: deploy/cf-tunnel
       - file: deploy/github-actions
       - file: deploy/balena

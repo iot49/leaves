@@ -17,7 +17,7 @@ EPOCH_OFFSET = 946684800 if time.gmtime(0)[0] == 2000 else 0
 ActionCallback: TypeAlias = Callable[..., Awaitable[None] | None]
 
 
-def make_uid(device_id: str, entity_id: str, node_id=bus.leaf_id) -> str:
+def make_uid(device_id: str, entity_id: str, node_id=bus.LEAF_ID) -> str:
     """Construct entity uid."""
     return f"{node_id}{UID_SEP}{device_id}{UID_SEP}{entity_id}"
 
@@ -135,9 +135,9 @@ class Device:
             'leaf_id.device_id.entity_id'
         """
         return (
-            f"{bus.leaf_id}{UID_SEP}{self.device_id}"
+            f"{bus.LEAF_ID}{UID_SEP}{self.device_id}"
             if entity_id is None
-            else f"{bus.leaf_id}{UID_SEP}{self.device_id}{UID_SEP}{entity_id}"
+            else f"{bus.LEAF_ID}{UID_SEP}{self.device_id}{UID_SEP}{entity_id}"
         )
 
     async def update(
@@ -156,6 +156,7 @@ class Device:
             uid=entity_id if "." in entity_id else self.uid(entity_id=entity_id),
             value=value,
             timestamp=timestamp,
+            dst="#clients",
         )
 
     def __str__(self):

@@ -2,8 +2,6 @@ import asyncio
 import functools
 from typing import Awaitable, Callable, TypeAlias
 
-from .singleton import singleton
-
 ALL_HANDLER = "*"
 NO_HANDLER = "!"
 
@@ -11,15 +9,17 @@ NO_HANDLER = "!"
 Callback: TypeAlias = Callable[..., Awaitable[None] | None]
 
 
-@singleton
 class Bus:
     """
     A class that represents an event emitter.
 
     The EventEmitter class allows registering event handlers for specific topics and emitting events to those handlers.
+
+    Attributes:
+        LEAF_ID (str): Address of this leaf.
     """
 
-    leaf_id: str = "leaf_id"
+    LEAF_ID: str | None = None
 
     def __init__(self, *, sync_queue_size=20, pause=0.1):
         """
@@ -29,10 +29,8 @@ class Bus:
             sync_queue_size (int): The maximum size of the emit_sync queue.
             pause (float): Delay between submission of sync events.
 
-        Attributes:
-            leaf_id (str): Address of this leaf.
         """
-        self.listeners: dict[str, list[Callback]] = {}
+        self.listeners: dict[str, list[Callback]] = {}  # topic -> [callbacks]
         self.event_queue = None
         self.sync_queue_size = sync_queue_size
         self.pause = pause
@@ -45,10 +43,15 @@ class Bus:
             self.listeners[topic].append(cb)
 
     def unsubscribe(self, cb: Callback, *topics):
-        """Unsubscribe callback to one or more topics."""
+        """Unsubscribe callback to one or more topics. If no topics are provided, remove cb from all topics."""
         for topic in topics:
-            if topic in self.listeners:
-                self.listeners[topic].remove(cb)
+            if topics:
+                if topic in self.listeners:
+                    self.listeners[topic].remove(cb)
+            else:
+                for listeners in self.listeners.values():
+                    if cb in listeners:
+                        listeners.remove(cb)
 
     def unsubscribe_all(self):
         """Remove all callbacks."""
@@ -114,8 +117,8 @@ class Bus:
             event = kwargs
         else:
             event.update(kwargs)
-        # used only by events that expect a response - set in those?
-        # if "src" not in event: event["src"] = self.leaf_id
+        if "src" not in event:
+            event["src"] = self.LEAF_ID
         topic = event.get("topic")
         if topic in self.listeners:
             # call registered handlers for the topic
@@ -144,11 +147,15 @@ class Bus:
             asyncio.create_task(self._sync_emit_task(self.pause))
 
         try:
+            if event is None:
+                event = kwargs
+            else:
+                event.update(kwargs)
             self.event_queue.put_nowait(event)
         except asyncio.QueueFull:
             pass
             # Note: no log message - as that would generate another emit_sync event!
-            print("***** sync event queue overflow")
+            # print("***** sync event queue overflow", event)
 
     async def _sync_emit_task(self, pause):
         """Helper task to send sync events."""
@@ -165,4 +172,7 @@ class Bus:
                 if isinstance(res, Awaitable):
                     await res
             except TypeError as e:
-                print("***** ERROR in bus.emit:", e)
+                print(
+                    f"***** ERROR in bus._call_handler: {event}",
+                    e,
+                )

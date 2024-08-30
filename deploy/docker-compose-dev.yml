@@ -58,7 +58,7 @@ services:
       - CF_EMAIL=${CF_EMAIL}
     restart: unless-stopped
     expose:
-      - 8000
+      - 5000
     volumes:
       - repo:/home/repo # git repository
       - homeassistant:/home/homeassistant # to set permissions (in start.sh)
@@ -72,7 +72,7 @@ services:
   # editor
   code-server:
     # image: lscr.io/linuxserver/code-server:latest
-    image: ttmetro/leaf-code-server:4.92.2
+    image: ttmetro/leaf-code-server
     container_name: ttmetro/leaf-code-server
     environment:
       - PUID=1000

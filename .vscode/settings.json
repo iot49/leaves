@@ -37,18 +37,6 @@
   "python.terminal.activateEnvironment": true,
   "python.testing.pytestEnabled": true,
   "python.analysis.typeCheckingMode": "standard",
-  "python.autoComplete.extraPaths": [
-    "../trees/remote",
-    "../trees/vm/src/freeze/lib",
-    "trees/vm/src/freeze/lib",
-    "trees/vm/src/freeze/lib/ina3221.py",
-    "../trees/vm/src/ina3221.py",
-    "trees/vm/src/ina3221.py",
-    "trees/vm/src",
-    "/Users/boser/Dropbox/iot/leaf/trees/vm/src/freeze/lib",
-    "/Users/boser/Dropbox/iot/leaf/trees/vm/src/freeze/lib/ina3221.py",
-    "/Users/boser/Dropbox/iot/leaf/trees/vm/src/freeze/lib/ina3221"
-  ],
   "prettier.configPath": "~/.prettierrc",
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",

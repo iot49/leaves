@@ -35,7 +35,7 @@ RUN pip install --upgrade pip && \
     pip install --no-cache /wheels/*
 
 # code: dev runs from /home/repo; prod runs from /home/app/web
-COPY ./leaf $APP_HOME/leaf
+COPY ./leaf/remote $APP_HOME/leaf
 
 # Note: build runs from repo root!
 WORKDIR $HOME
