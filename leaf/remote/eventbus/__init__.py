@@ -1,6 +1,13 @@
 # ruff: noqa: F401
 # ruff: noqa: E402
 
+
+"""
+global:
+    bus: Bus
+    Note: set bus.LEAF_ID before use!
+"""
+
 from .ev_bus import Bus
 
 bus = Bus()

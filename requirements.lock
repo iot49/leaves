@@ -34,6 +34,10 @@ cryptograpy==0.0.0
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
+gitdb==4.0.11
+    # via gitpython
+gitpython==3.1.43
+    # via leaves
 idna==3.8
     # via yarl
 mergedeep==1.3.4
@@ -53,5 +57,7 @@ pyopenssl==24.2.1
     # via leaves
 pyyaml==6.0.2
     # via leaves
+smmap==5.0.1
+    # via gitdb
 yarl==1.9.4
     # via aiohttp

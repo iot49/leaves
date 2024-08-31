@@ -1,5 +1,27 @@
 {
+  "workbench.editor.enablePreview": false,
+  "explorer.confirmDelete": false,
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "explorer.confirmDragAndDrop": false,
   "workbench.colorTheme": "Visual Studio Light",
+  "git.openRepositoryInParentFolders": "always",
+  "git.autofetch": true,
+  "jupyter.askForKernelRestart": false,
+  "notebook.lineNumbers": "on",
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "cmake.configureOnOpen": false,
+  "workbench.editorAssociations": {
+    "*.csv": "gc-excelviewer-csv-editor"
+  },
+  "githubPullRequests.createOnPublishBranch": "never",
+  "github.copilot.editor.enableAutoCompletions": true,
+  "makefile.configureOnOpen": false,
+  "python.defaultInterpreterPath": "/Users/boser/Dropbox/iot/leaves/.venv",
+  "jupyter.notebookFileRoot": "${workspaceFolder}/leaf/remote",
   "workbench.iconTheme": "vscode-icons",
   "editor.formatOnSave": true,
   "liveServer.settings.CustomBrowser": "chrome",
@@ -22,9 +44,6 @@
   },
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[python]": {
     "editor.formatOnSave": true,
@@ -62,16 +81,6 @@
     "**/__pycache__": true
   },
   "git.ignoreLimitWarning": true,
-  "workbench.editor.enablePreview": false,
-  "explorer.confirmDelete": false,
-  "terminal.integrated.defaultProfile.osx": "zsh",
-  "explorer.confirmDragAndDrop": false,
-  "git.openRepositoryInParentFolders": "always",
-  "git.autofetch": true,
-  "jupyter.askForKernelRestart": false,
-  "notebook.lineNumbers": "on",
-  "git.confirmSync": false,
-  "git.enableSmartCommit": true,
   "python.analysis.extraPaths": [
     "../trees/remote",
     "../trees/vm/src/freeze/lib",

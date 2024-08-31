@@ -15,6 +15,7 @@ dependencies = [
     "pyopenssl>=24.1.0",
     "paramiko>=3.4.0",
     "colored>=2.2.4",
+    "gitpython>=3.1.43",
 ]
 
 [build-system]
@@ -52,4 +53,4 @@ exclude = ["alembic"]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["earth/backend/app", "events/eventbus"]
+packages = ["leaf/remote"]

@@ -28,16 +28,9 @@ serve:
 	rye run uvicorn app.main:app --host 0.0.0.0 --port 8001 --log-level error --reload
 
 deploy:
-	(cd deploy && set -o allexport && source ../.env && set +o allexport && envsubst < "docker-compose-dev.yml" > "docker-compose.yml";)
+	(cd deploy && set -o allexport && source ../../leaf49-config/.env && set +o allexport && envsubst < "docker-compose-dev.yml" > "docker-compose.yml";)
 	cd deploy && balena push -m boser/leaf49
 	cd deploy && rm docker-compose.yml
-
-deploy-extra:
-	(cd deploy && set -o allexport && source ../.env-extra && set +o allexport && envsubst < "docker-compose-dev.yml" > "docker-compose.yml";)
-	cd deploy && balena push -m boser/leaf-extra
-	cd deploy && rm docker-compose.yml
-
-
 
 doc:
 	jupyter-book build doc

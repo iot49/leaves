@@ -1,21 +1,26 @@
 import re
 import time
-from typing import Awaitable, Callable, TypeAlias
 
 from .. import bus
 
 # separation characters in uid's
 UID_SEP = "."
 
-# Convert CamelCase to snake_case (also apply lower to result)
-RE_CAMEL_TO_SNAKE = re.compile(r"(?<!^)(?=[A-Z])")
 
 # MicroPython time starts from 2000-01-01 on some ports
 EPOCH_OFFSET = 946684800 if time.gmtime(0)[0] == 2000 else 0
 
-# callback(device: Device, uid: str, **event: Any) -> Awaitable[None] | None
-ActionCallback: TypeAlias = Callable[..., Awaitable[None] | None]
+# MicroPython does not support this
+# from typing import Awaitable, Callable, TypeAlias
+# ActionCallback: TypeAlias = Callable[..., Awaitable[None] | None]
 
+async def ActionCallback(*args): 
+    pass
+
+
+
+def camel_to_snake(s):
+    return ''.join(['_'+c.lower() if c.isupper() else c for c in s]).lstrip('_')
 
 def make_uid(device_id: str, entity_id: str, node_id=bus.LEAF_ID) -> str:
     """Construct entity uid."""
@@ -115,7 +120,7 @@ class Device:
     @property
     def domain(self):
         """Compatibility with Home Assistant"""
-        return RE_CAMEL_TO_SNAKE.sub("_", self.__class__.__name__).lower()
+        return camel_to_snake(self.__class__.__name__)
 
     def uid(self, entity_id: str | None = None) -> str:
         """

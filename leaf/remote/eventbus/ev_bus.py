@@ -1,12 +1,16 @@
 import asyncio
 import functools
-from typing import Awaitable, Callable, TypeAlias
+from typing import Awaitable
 
 ALL_HANDLER = "*"
 NO_HANDLER = "!"
 
+# MicroPython does not support this
+# from typing import Awaitable, Callable, TypeAlias
+# Callback: TypeAlias = Callable[..., Awaitable[None] | None]
 
-Callback: TypeAlias = Callable[..., Awaitable[None] | None]
+async def Callback(*args): 
+    pass
 
 
 class Bus:

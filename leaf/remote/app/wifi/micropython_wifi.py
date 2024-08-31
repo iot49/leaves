@@ -2,38 +2,34 @@ import asyncio
 import logging
 
 import network  # type: ignore
+from . import WifiException
 
 """MicroPython wifi."""
 
-SLEEP_MS = 200
+CONNECT_SLEEP_MS = 200
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-
-class WifiException(Exception):
-    pass
 
 
 class Radio:
     def __init__(self):
         self._enabled_count = 0
         self._sta = network.WLAN(network.STA_IF)
-
-    def __aenter__(self):
+        
+    async def __aenter__(self):
         if self._enabled_count < 1:
             self._sta.active(True)
-            logger.debug("radio ON")
         self._enabled_count += 1
+        return self
 
-    def __aexit__(self, *args):
+    async def __aexit__(self, exc_type, exc_value, traceback):
         self._enabled_count -= 1
         if self._enabled_count < 1:
             try:
                 self._sta.active(False)
             except OSError:
                 pass
-            logger.debug("radio OFF")
 
     def scan(self):
         return "\n".join(
@@ -46,6 +42,12 @@ class Radio:
 
     def ssids(self):
         return [r[0].decode() for r in self._sta.scan() if r[0]]
+    
+    async def mac_address(self) -> str:
+        async with self:
+            wlan_mac = self._sta.config("mac")
+            return ":".join([f"{b:02x}" for b in wlan_mac])
+
 
 
 class Wifi:
@@ -80,18 +82,19 @@ class Wifi:
                 logger.info("Connecting to {}".format(w["ssid"]))
                 radio._sta.connect(w["ssid"], w["pwd"])  # type: ignore
                 # wait for connection
-                for _ in range(10_000 // SLEEP_MS):
+                for _ in range(10_000 // CONNECT_SLEEP_MS):
                     if radio._sta.isconnected():  # type: ignore
                         self.ssid = w["ssid"]
                         print()
                         logger.info(f"Connected to {self.ssid} @ {self.ip}")
                         self._enabled_count += 1
                         return
-                    await asyncio.sleep_ms(SLEEP_MS)  # type: ignore
+                    await asyncio.sleep_ms(CONNECT_SLEEP_MS)  # type: ignore
                     print(".", end="")
         raise WifiException("Connection failed")
+        return self
 
-    async def __aexit__(self, *args):
+    async def __aexit__(self, exc_type, exc_value, traceback):
         self._enabled_count -= 1
         if self._enabled_count < 1:
             try:
@@ -101,6 +104,3 @@ class Wifi:
             radio.__aexit__()
             logger.info("disconnected from Wifi")
 
-
-radio = Radio()
-wifi = Wifi()

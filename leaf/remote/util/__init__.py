@@ -3,7 +3,6 @@
 import sys
 import time
 
-from .mac_address import mac_address
 
 
 def ticks_ms():
@@ -15,3 +14,4 @@ def ticks_ms():
 
 def is_micropython():
     return "micropython" in sys.implementation.name
+
