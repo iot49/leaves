@@ -51,9 +51,7 @@ class Bridge:
             for _ in range(2):
                 try:
                     # wait for events from client
-                    msg = await asyncio.wait_for(
-                        self.transport.receive(), self.receive_timeout
-                    )
+                    msg = await asyncio.wait_for(self.transport.receive(), self.receive_timeout)
                     # post received events from client to local bus
                     for event in msg.split("\n")[:-1]:
                         logger.debug(f"EMIT {event}")

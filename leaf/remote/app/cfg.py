@@ -93,10 +93,14 @@ class Config:
         # push changes to git
         import git
 
-        g = git.cmd.Git(self.CONFIG_DIR)  # type: ignore
-        g.add(".")
-        g.commit("-m", commit_msg)
-        g.push()
+        try:
+            g = git.cmd.Git(self.CONFIG_DIR)  # type: ignore
+            g.add(".")
+            g.commit("-m", commit_msg)
+            g.push()
+        except git.GitCommandError:
+            # no changes to push
+            pass
 
     def pull_from_git(self):
         import git
@@ -131,10 +135,6 @@ class Config:
         for leaf_id, leaf in self.get("leaves", {}).items():
             if leaf.get("mac_addr") == mac_addr:
                 return leaf_id
-        # create new leaf for this mac
-        with open(os.path.join(self.CONFIG_DIR, "yaml-config", "leaves", "new_leaf.yaml"), "w") as f:
-            f.write(f"mac_addr: {mac_addr}")
-        self.push_to_git(f"new leaf with mac-address {mac_addr}")
-
-        logger.info(f"new leaf with mac-address {mac_addr}")
-        return "new_leaf"
+        # not in configuration - send out discovery message
+        await bus.emit(topic="!discover", id=mac_addr, message="new leaf")
+        return "new_leaf"  # temporary id

@@ -1,10 +1,9 @@
 import asyncio
 
 from app import wifi
+from eventbus import Bridge
 from microdot import Microdot, abort
 from microdot.websocket import WebSocket, websocket_upgrade
-
-from ...eventbus.event_net.bridge import Bridge
 
 app = Microdot()
 

@@ -81,20 +81,29 @@ async def app_main():
     logger.setLevel(logging.INFO)
     logger.info(f"Starting leaf {bus.LEAF_ID}")
 
-    # load plugins
+    # update config
+    # TODO: proper mechanism for updating config
     config.update()
-    print(config.get())
+
+    # load plugins
     plugins = config.get("leaves/root/plugins", {})
-    print("LOADING", plugins)
     for module, param in plugins.items():
         param = param or {}
         m = __import__(module, None, None, ("all",), 0)
-        print("init", module, param, hasattr(m, "init"))
+        logger.info(f"loading {module} with param {param}")
         if hasattr(m, "init"):
             res = m.init(**param)
             if isinstance(res, Awaitable):
                 await res
+        else:
+            if param:
+                logger.warning(
+                    f"plugin {module} has no init function, but parameters are specified in configuration ({param})"
+                )
 
     # don't exit
-    while True:
-        await asyncio.sleep(1)
+    try:
+        while True:
+            await asyncio.sleep(1)
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        print("so long ...")

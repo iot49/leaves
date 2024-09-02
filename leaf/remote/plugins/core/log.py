@@ -56,6 +56,7 @@ class Log:
 
         @bus.on("?log")
         async def get_log(src, **event):
+            # TODO: should send out !log ???
             # send logging history
             history = self.history
             dst = src

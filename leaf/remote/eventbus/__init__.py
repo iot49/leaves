@@ -17,6 +17,7 @@ from .devices.binary_sensor import BinarySensor
 from .devices.light import Light
 from .devices.sensor import Sensor
 from .devices.switch import Switch
+from .event_net import Bridge, Transport
 
 
 @bus.on("?echo")
