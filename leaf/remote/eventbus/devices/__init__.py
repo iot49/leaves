@@ -1,4 +1,3 @@
-import re
 import time
 
 from .. import bus
@@ -14,13 +13,14 @@ EPOCH_OFFSET = 946684800 if time.gmtime(0)[0] == 2000 else 0
 # from typing import Awaitable, Callable, TypeAlias
 # ActionCallback: TypeAlias = Callable[..., Awaitable[None] | None]
 
-async def ActionCallback(*args): 
+
+async def ActionCallback(*args):
     pass
 
 
-
 def camel_to_snake(s):
-    return ''.join(['_'+c.lower() if c.isupper() else c for c in s]).lstrip('_')
+    return "".join(["_" + c.lower() if c.isupper() else c for c in s]).lstrip("_")
+
 
 def make_uid(device_id: str, entity_id: str, node_id=bus.LEAF_ID) -> str:
     """Construct entity uid."""
@@ -112,10 +112,7 @@ class Device:
 
     @property
     def info(self):
-        return {
-            uid: {"kind": kind, "attributes": attr}
-            for uid, (kind, _, attr) in self.entities.items()
-        }
+        return {uid: {"kind": kind, "attributes": attr} for uid, (kind, _, attr) in self.entities.items()}
 
     @property
     def domain(self):
@@ -145,9 +142,7 @@ class Device:
             else f"{bus.LEAF_ID}{UID_SEP}{self.device_id}{UID_SEP}{entity_id}"
         )
 
-    async def update(
-        self, entity_id, value, timestamp: float = time.time() + EPOCH_OFFSET
-    ):
+    async def update(self, entity_id, value, timestamp: float = time.time() + EPOCH_OFFSET):
         """Helper to emit a state update events.
 
         Args:

@@ -3,6 +3,7 @@
 import sys
 import time
 
+from .with_cd import WithCD
 
 
 def ticks_ms():
@@ -14,4 +15,3 @@ def ticks_ms():
 
 def is_micropython():
     return "micropython" in sys.implementation.name
-

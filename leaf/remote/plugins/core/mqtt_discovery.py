@@ -2,12 +2,8 @@
 
 
 import asyncio
-import re
 
 from eventbus import bus
-
-# Convert CamelCase to snake_case (also apply lower to result)
-RE_CAMEL_TO_SNAKE = re.compile(r"(?<!^)(?=[A-Z])")
 
 
 async def init(client):

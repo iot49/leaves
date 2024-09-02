@@ -85,7 +85,6 @@ Mapping = _SubSingleton
 MutableMapping = _SubSingleton
 Sequence = _SubSingleton
 MutableSequence = _SubSingleton
-TypeAlias = _SubSingleton
 
 
 class ByteString:

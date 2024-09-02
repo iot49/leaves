@@ -1,20 +1,30 @@
 import asyncio
 import logging
-import os
 import sys
 import time
+from typing import Awaitable
 
-from eventbus import Config, Log, bus
+from eventbus import bus
 from util import is_micropython
+
+from .cfg import Config
 from .wifi import Radio, Wifi
 
 radio = Radio()
 wifi = Wifi()
 config = Config()
 
+if is_micropython():
+    from .led import LED
+
+    led = LED()
+
+
 # logging must be configured before any actual logging
 def configure_logging():
     class LogHandler(logging.Handler):
+        """Post !log events. Subscribe elsewhere to display them"""
+
         def emit(self, record):
             try:
                 timestamp = record.created
@@ -22,6 +32,7 @@ def configure_logging():
                 # Micropython logging uses record.ct
                 EPOCH_OFFSET = 946684800 if time.gmtime(0)[0] == 2000 else 0
                 timestamp = record.ct + EPOCH_OFFSET  # type: ignore
+            # TODO: trap invalid messages (e.g. binary data)
             self.format(record)
             bus.emit_sync(
                 topic="!log",
@@ -56,7 +67,6 @@ def global_exception_handler(loop, context):
 
 
 async def app_main():
-
     # trap unhandled exceptions
     loop = asyncio.get_event_loop()
     loop.set_exception_handler(global_exception_handler)
@@ -66,14 +76,24 @@ async def app_main():
 
     # logging
     configure_logging()
-    Log()
 
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     logger.info(f"Starting leaf {bus.LEAF_ID}")
 
     # load plugins
-    # ...
+    config.update()
+    print(config.get())
+    plugins = config.get("leaves/root/plugins", {})
+    print("LOADING", plugins)
+    for module, param in plugins.items():
+        param = param or {}
+        m = __import__(module, None, None, ("all",), 0)
+        print("init", module, param, hasattr(m, "init"))
+        if hasattr(m, "init"):
+            res = m.init(**param)
+            if isinstance(res, Awaitable):
+                await res
 
     # don't exit
     while True:

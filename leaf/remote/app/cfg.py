@@ -4,9 +4,8 @@ import os
 from datetime import datetime
 from typing import Any
 
-from util import is_micropython
-
 from eventbus import bus
+from util import WithCD, is_micropython
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -46,35 +45,41 @@ class Config:
         except (KeyError, AttributeError):
             return default
         return res
-    
+
     def update(self):
-        import glob, yaml
+        import glob
 
-        # compile from yaml
-        version = max(
-            [
-                os.path.getmtime(file)
-                for file in glob.iglob(
-                    os.path.join(self.CONFIG_DIR, "yaml-config", "**/*.yaml"), recursive=True
-                )
-            ]
-        )
-        version = datetime.fromtimestamp(version).isoformat()
-        if version == self.get("version"):
-            print("already up to date")
-            return
-        print(
-            f'# machine generated\nversion: "{version}"',
-            file=open(os.path.join(self.CONFIG_DIR, "version.yaml"), "w"),
-        )
+        import yaml
 
-        # now load the config from yaml files
-        cfg = {}
-        for file in glob.iglob(
-            os.path.join(self.CONFIG_DIR, "**/*.yaml"), recursive=True
-        ):
-            basename = os.path.splitext(os.path.basename(file))[0]
-            cfg[basename] = yaml.safe_load(open(file, "r"))
+        # TODO: with cd ...
+        with WithCD(os.path.join(self.CONFIG_DIR, "yaml-config")):
+            # compile from yaml
+            version = max(
+                [
+                    os.path.getmtime(file)
+                    for file in glob.iglob("**/*.yaml", recursive=True)
+                    if "version.yaml" not in file
+                ]
+            )
+            version = datetime.fromtimestamp(version).isoformat()
+            if version == self.get("version"):
+                print("already up to date")
+                return
+
+            with open("version.yaml", "w") as f:
+                f.write(json.dumps(version))
+
+            # now load the config from yaml files
+            cfg = {}
+            for file in glob.iglob("**/*.yaml", recursive=True):
+                f = file.rsplit(".", 1)[0]
+                s = f.rsplit("/")
+                c = cfg
+                for x in s[:-1]:
+                    if x not in c:
+                        c[x] = {}
+                    c = c[x]
+                c[s[-1]] = yaml.safe_load(open(file, "r"))
 
         # save as json
         json.dump(cfg, open(self.CONFIG_FILE, "w"), indent=2)
@@ -87,6 +92,7 @@ class Config:
     def push_to_git(self, commit_msg: str):
         # push changes to git
         import git
+
         g = git.cmd.Git(self.CONFIG_DIR)  # type: ignore
         g.add(".")
         g.commit("-m", commit_msg)
@@ -94,7 +100,8 @@ class Config:
 
     def pull_from_git(self):
         import git
-        g = git.cmd.Git(self.CONFIG_DIR)
+
+        g = git.cmd.Git(self.CONFIG_DIR)  # type: ignore
         g.pull()
 
     def _load(self):
@@ -119,6 +126,7 @@ class Config:
     async def leaf_id(self) -> str:
         """Get leaf id."""
         from app import radio
+
         mac_addr = await radio.mac_address()
         for leaf_id, leaf in self.get("leaves", {}).items():
             if leaf.get("mac_addr") == mac_addr:

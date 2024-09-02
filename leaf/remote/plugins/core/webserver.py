@@ -4,7 +4,7 @@ from app import wifi
 from microdot import Microdot, abort
 from microdot.websocket import WebSocket, websocket_upgrade
 
-from .bridge import Bridge
+from ...eventbus.event_net.bridge import Bridge
 
 app = Microdot()
 
@@ -39,6 +39,4 @@ async def ws(request):
 
 async def init(host="localhost", port=5000, debug=False, ssl=None):
     async with wifi:
-        asyncio.create_task(
-            app.start_server(host=host, port=port, debug=debug, ssl=ssl)
-        )
+        asyncio.create_task(app.start_server(host=host, port=port, debug=debug, ssl=ssl))

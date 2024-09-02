@@ -17,9 +17,6 @@ from .devices.binary_sensor import BinarySensor
 from .devices.light import Light
 from .devices.sensor import Sensor
 from .devices.switch import Switch
-from .listeners.config import Config
-from .listeners.log import Log
-from .listeners.sensor_state import SensorState
 
 
 @bus.on("?echo")

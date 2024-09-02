@@ -1,0 +1,1 @@
+TAG = ''; BOARD = 'ESP32_S3_N16R8'; GITHUB_REPOSITORY = 'iot49/leaf'; IDF_VERSION = 'v5.0.4'

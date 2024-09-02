@@ -16,6 +16,8 @@ aiohappyeyeballs==2.4.0
     # via aiohttp
 aiohttp==3.10.5
     # via leaves
+aiomqtt==2.3.0
+    # via leaves
 aiosignal==1.3.1
     # via aiohttp
 alabaster==0.7.16
@@ -246,6 +248,8 @@ mdurl==0.1.2
     # via markdown-it-py
 mergedeep==1.3.4
     # via leaves
+microdot==2.0.6
+    # via leaves
 mistune==3.0.2
     # via nbconvert
 mpkernel==0.0.1
@@ -293,6 +297,8 @@ packaging==24.1
     # via pytest
     # via sphinx
     # via sphinx-jupyterbook-latex
+paho-mqtt==2.1.0
+    # via aiomqtt
 pandocfilters==1.5.1
     # via nbconvert
 paramiko==3.4.1

@@ -1,7 +1,6 @@
-import asyncio
-
-from eventbus.bus import Counter
+print("hello from counter.py")
 
 
-async def init(eid: str, interval: float = 10, N: int = 1000):
-    asyncio.create_task(Counter(eid, interval=interval).counter_task())
+async def init(eid, interval):
+    print("init counter!", eid, interval)
+    return 0

@@ -4,7 +4,7 @@ import logging
 import time
 from collections import deque
 
-from .. import bus
+from eventbus import bus
 
 BLUE = "\x1b[38;5;4m"
 GREEN = "\x1b[38;5;2m"
@@ -28,9 +28,7 @@ class Log:
             # append to history and print to console
             if self.last_event is not None:
                 last = self.last_event
-                if last.get("levelno") == event.get("levelno") and last.get(
-                    "message"
-                ) == event.get("message"):
+                if last.get("levelno") == event.get("levelno") and last.get("message") == event.get("message"):
                     last["count"] = last.get("count", 1) + 1
                     return
             levelno = event.get("levelno", 0)
@@ -45,9 +43,7 @@ class Log:
             }
             color = colors.get(levelno, "")
             funcName = event.get("funcName") or ""
-            t = time.strftime(
-                "%Y-%m-%d %H:%M:%S", time.gmtime(event.get("timestamp", 0))
-            )  # type: ignore
+            t = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(event.get("timestamp", 0)))  # type: ignore
             count = event.get("count")
             # BUG: count is never reported (see return above ...)
             repeat = f"[{count}] " if count is not None else ""
@@ -70,3 +66,8 @@ class Log:
                 # retarget event to requester
                 ev["dst"] = dst
                 await bus.emit(ev)
+
+
+def init():
+    # register listeners
+    Log()

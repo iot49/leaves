@@ -1,4 +1,4 @@
-from .. import bus
+from eventbus import bus
 
 
 class SensorState:
@@ -17,16 +17,10 @@ class SensorState:
                 # copy keys to protect against modification in !state by a different task
                 for uid in list(self._state.keys()):
                     value, ts = self._state[uid]
-                    await bus.emit(
-                        topic="!state", uid=uid, value=value, timestamp=ts, dst=src
-                    )
+                    await bus.emit(topic="!state", uid=uid, value=value, timestamp=ts, dst=src)
             else:
                 if uid in self._state:
                     value, ts = self._state[uid]
-                    await bus.emit(
-                        topic="!state", uid=uid, value=value, timestamp=ts, dst=src
-                    )
+                    await bus.emit(topic="!state", uid=uid, value=value, timestamp=ts, dst=src)
                 else:
-                    await bus.emit(
-                        topic="#state", uid=uid, error="state not known", dst=src
-                    )
+                    await bus.emit(topic="#state", uid=uid, error="state not known", dst=src)

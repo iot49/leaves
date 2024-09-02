@@ -1,11 +1,10 @@
 # secrets
-.env*
-
-# other exclusions
-*.db
-docker-compose.yml
+.envrc
 
 # machine generated stuff
+leaf/vm/firmware/
+*.db
+docker-compose.yml
 .DS_Store
 .coverage
 .venv/
