@@ -25,7 +25,7 @@ class Bridge:
     """
 
     # time to keep connection open when no messages are receivedan [seconds]
-    receive_timeout = 3
+    receive_timeout = 10
     max_latency = 0.5
     size_threshold = 4000
 
@@ -52,6 +52,7 @@ class Bridge:
                 try:
                     # wait for events from client
                     msg = await asyncio.wait_for(self.transport.receive(), self.receive_timeout)
+                    print(f"RECV Bridge.run: {bus.LEAF_ID}: {msg}")
                     # post received events from client to local bus
                     for event in msg.split("\n")[:-1]:
                         logger.debug(f"EMIT {event}")
