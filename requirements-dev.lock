@@ -151,6 +151,7 @@ ipykernel==6.29.5
     # via jupyter
     # via jupyter-console
     # via jupyterlab
+    # via leaves
     # via mpkernel
     # via myst-nb
 ipython==8.27.0
