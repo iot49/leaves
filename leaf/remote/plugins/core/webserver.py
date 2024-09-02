@@ -13,6 +13,7 @@ WebSocket.max_message_length = 1024 * 1024
 
 @app.route("/")
 async def index(request):
+    print("webserver got / request", request)
     return "Hello leaf!"
 
 
@@ -36,6 +37,6 @@ async def ws(request):
     await bridge.run()
 
 
-async def init(host="localhost", port=5000, debug=False, ssl=None):
+async def init(host="0.0.0.0", port=5000, debug=False, ssl=None):
     async with wifi:
         asyncio.create_task(app.start_server(host=host, port=port, debug=debug, ssl=ssl))

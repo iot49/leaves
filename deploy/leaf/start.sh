@@ -15,13 +15,15 @@ chmod a+rx /home/letsencrypt/archive
 
 # clone/update leaves repo
 if [[ -d /home/repo/leaves ]]; then
-    (cd /home/repo/leaves; git pull)
+    # TODO: version control
+    # (cd /home/repo/leaves; git pull)
 else
     (cd /home/repo; git clone https://github.com/iot49/leaves.git)
 fi
 
 # clone/update ${DEPLOY_NAME}-config repo
 if [[ -d /home/repo/${DEPLOY_NAME}-config ]]; then
+    # TODO: version control
     (cd /home/repo/${DEPLOY_NAME}-config; git pull)
 else
     (cd /home/repo; git clone https://${GITHUB_ACCESS_TOKEN}@github.com/iot49/${DEPLOY_NAME}-config.git)
@@ -29,16 +31,17 @@ fi
 
 # fix ownership and permissions to edit files with code-server
 chown -R app:app /home/repo
-chmod a+w /home/homeassistant/*.yaml  # homeassistant runs as root ...
+# homeassistant runs as root ...
+chmod a+w /home/homeassistant/*.yaml  
 
-# start app
-if [[ ${ENVIRONMENT} == "prod" ]]; then
-    # run from docker image
-    (cd app/leaf; setuidgid app python main.py)
-else
-    # run from repo (setup in editor with rye)
-    (cd /home/repo/leaves/leaf/remote; setuidgid app python main.py)
-fi
-
-sleep infinity
+while true ; do
+    # start app
+    if [[ ${ENVIRONMENT} == "prod" ]]; then
+        # run from docker image
+        (cd app/leaf; setuidgid app python main.py)
+    else
+        # run from repo (setup in editor with rye)
+        (cd /home/repo/leaves/leaf/remote; setuidgid app python main.py)
+    fi
+done
 

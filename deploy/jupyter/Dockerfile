@@ -1,11 +1,10 @@
 FROM jupyter/scipy-notebook:latest
 
-# this works
+# this works (but makes no sense if /home/joyan is hidden by volume mount)
 WORKDIR /home/jovyan
 
 # fails in RUN below ???
 WORKDIR /usr/local/src
-
 
 COPY ./requirements.lock .
 COPY ./requirements-dev.lock .
